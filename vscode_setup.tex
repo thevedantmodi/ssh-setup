@@ -1,0 +1,89 @@
+%%%%%%%%%%
+% VSCode and SFTP installation instructions
+%%%%%%%%%%
+
+\documentclass[12pt]{article}
+
+\usepackage[normalem]{ulem}
+\usepackage[T1]{fontenc}
+\usepackage[svgnames]{xcolor}
+\usepackage[paperheight=27.94cm,paperwidth=21.59cm,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm]{geometry}
+\usepackage{hyperref}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+
+\setlength{\fboxrule}{1pt}
+\fcolorbox{red}{white}{
+\parbox{\textwidth}{
+Note: this is an updated version of the setup instructions to sync to a specific cs15 folder in your Halligan account. If you have already set up the SFTP extension to sync the entire contents of your Halligan account, you do not need to do anything. However, only syncing your cs15 files will be faster than syncing everything, so you may want to switch.
+}
+}
+
+\vspace{1\baselineskip}
+{\Large \textbf{Installing VSCode}}
+
+\vspace{1\baselineskip}
+You should begin by downloading and installing the VS Code editor. You can download VS Code \href{https://code.visualstudio.com/}{\textcolor[HTML]{1155CC}{\uline{here}}}.
+
+\vspace{1\baselineskip}
+Once VSCode is installed, there is one setting that \textit{must} be configured in order for it to function properly. Open VSCode (just like you would a Web Browser), and click \texttt{Code -> Preferences -> Settings}. This will bring up a "Settings" window with a search bar at the top. Type in "eol"; the top result should say "\texttt{Files: Eol (Also modified elsewhere)}". Click the drop-down menu associated with that result and select "\texttt{\textbackslash n}". All done!
+
+\vspace{1\baselineskip}
+{\Large \textbf{How to setup SFTP on VSCode}}
+
+\vspace{1\baselineskip}
+We will be using VSCode's \textbf{SFTP} extension to sync files between your personal computer and your Halligan space. Specifically, SFTP is a protocol that lets you upload and download files from your local computer to a remote computer or server. In CS 15, you will be connecting remotely to the "Halligan servers" on campus. This lets you edit your code on your personal computer, but compile and submit it from the Halligan servers. In other words, you will always have a copy of your work in both locations, your computer and the Halligan servers!
+
+\vspace{1\baselineskip}
+The following steps walk you through the installation process for this SFTP extension. Open up VSCode to get started.
+
+\begin{enumerate}
+\item
+SFTP is all about syncing files between the Halligan homework server and your personal computer, so you will need a mirror image of your files on Halligan. Create a folder on your personal computer called "cs15". You can then either drag that empty folder into VSCode or click \texttt{File -> Open Folder}; if asked whether you'd like to "copy" the file or "add it to your workspace", pick "add it to your workspace." The folder should then appear in the left sidebar. If this is the first time you've opened this folder, you might get a message about "trusting the authors of the files." Select "Yes, I trust the authors."
+
+\item
+Now we will install the ``SFTP" extension. To do so, click on \texttt{Code -> Preferences -> Extensions}, and enter "sftp" in the search field. Then click "Install" on the "SFTP" extension written by developer ``Natizyskunk" (should be the first or second result).
+
+\item
+Now that you have the SFTP extension installed, you need to use it to establish a sync between your personal computer's "cs15" folder and a folder in your Halligan space. Make sure you're "in" VSCode (just click somewhere in the window) and if you are on a Windows/Linux press \textbf{Ctrl + Shift + P} or if you are on a Mac press \textbf{Cmd + Shift + P}. This will open up the VSCode "command prompt". In the prompt type the command "SFTP: Config" and hit Enter.
+
+\item
+You should now see a configuration file opened in VSCode. First, delete everything in the file. Next, copy-paste the following text into the file:
+\begin{verbatim}
+       {
+          "name": "Halligan",
+          "host": "homework.cs.tufts.edu",
+          "protocol": "sftp",
+          "port": 22,
+          "username": "[YOUR UTLN]",
+          "password": "[YOUR PASSWORD]",
+          "remotePath": "/h/[YOUR UTLN]/cs15/",
+          "uploadOnSave": true,
+          "ignore": [
+            ".*",
+            "*.o",
+            "*.core",
+            "*.vgcore",
+            "the_MetroSim",
+            "theCalcYouLater",
+            "the_zap",
+            "the_gerp",
+            "bad_zap_file",
+            "proj-gerp-test-dirs"
+          ]
+        }
+\end{verbatim}
+
+Finally, in the text you just pasted into VSCode, replace [UTLN] with your CS Login username (e.g., mkorma01) on both the "username" and "remotePath" lines, and replace [YOUR PASSWORD] with your CS account password. The brackets should be removed, e.g. if the username is mkorma01, the configuration file should say \texttt{"username": "mkorma01"}. \textit{Save the new file!}
+
+\item
+When syncing to the Halligan server, the configuration above tells VSCode to sync the “cs15” folder on your own computer with a “cs15” folder on the Halligan server. Try creating a file in the ``cs15'' folder on your computer and saving it, which will automatically upload it to the server, creating the folder in the process.
+
+\item
+Now comes the moment of truth: actually syncing your files! At the start of each lab and assignment, you will begin working by logging into Halligan (either remotely or on a lab machine) and copying starter files into your Halligan space. The next step (if you're working on your personal machine) is to sync those files with the Halligan folder on your personal computer. To do so, open the VSCode command prompt the same way you did earlier (step 4), type "SFTP: Sync Remote -> Local" (\textbf{DO NOT SELECT "SFTP: Local -> Remote"}, as this will sync an empty folder to your remote folder, deleting everything in the remote folder), and hit Enter. This will copy all of the files from your cs15 folder on the Halligan server onto your personal computer, which will allow you to begin editing them. The changes you make on your personal computer will be uploaded to Halligan every time you save your work. Congratulations! You’re now set up to work in CS 15. If things aren’t working properly, please stop by office hours and a TA can help get you on track.
+
+\end{enumerate}
+
+\end{document}

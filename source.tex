@@ -1,0 +1,188 @@
+
+\documentclass[12pt]{article}
+
+\usepackage[normalem]{ulem}
+\usepackage[T1]{fontenc}
+\usepackage[svgnames]{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\title{A nice \texttt{ssh} setup}
+\author{Vedant Modi}
+\date{ } 
+
+\setcounter{section}{-1}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\vspace{0.5\baselineskip}
+
+\section{Introduction}
+
+This document serves as a setup guide for a \textbf{secure}, \textbf{fast}, and
+\textbf{convenient} configuration of \texttt{ssh}. In place of authentication
+via a password, which is a little antiquated, we will use an \texttt{ssh} key.
+With a key, authentication and access to your server from your local machine
+will be password-less, but still secure. 
+
+\vspace{0.5\baselineskip}
+
+I hope this is more convenient for access to servers you can connect to, like
+an institution's server, or cloning a GitHub repository on to your local
+machine.
+
+\vspace{0.5\baselineskip}
+
+\textit{Note:} This guide assumes basic knowledge and access, of Unix, or Unix-like systems
+like macOS.
+
+\section{Connecting via \texttt{ssh}}
+\vspace{1\baselineskip}
+
+First, establish a connection to your server via \texttt{ssh}. This can be done
+with \verb|ssh user@hostname|, for example, to get into my Tufts EECS server, I
+use my username \verb|vmodi01|, and the hostname \verb|homework.cs.tufts.edu|
+to login. The command, there, would be \begin{verbatim}
+    ssh vmodi01@homework.cs.tufts.edu
+\end{verbatim}
+
+Sometimes, we say to use the \texttt{-X} or \texttt{-Y} flag, but this is
+usually only needed if you need to display a \textbf{GUI}, 
+so these flags are not required if one is dealing with only terminal output
+(most cases). If using a program like \texttt{kcachegrind} or \texttt{display},
+then you probably need it.
+
+After entering the \texttt{ssh} command described above, you will be prompted
+for credentials (username and password). Enter them, and ensure that you can
+login.
+
+\section{Creating an \texttt{ssh} key}
+\vspace{1\baselineskip}
+
+Next, we will create an \texttt{ssh} key. To start, open your system terminal,
+and ensure that you are \textit{not} connected to the \texttt{ssh} from step 1.
+Generate an \texttt{ssh} key by doing \begin{verbatim}
+    ssh-keygen -t ed25519 -C "user@hostname"
+\end{verbatim}
+
+The \texttt{-t} flag specifies the \texttt{ed25519} algorithm to generate the
+key, and the \texttt{-C} flag specifies a nickname that you can see in the
+generated file. The command will ask for a location to save it to. 
+By default, it should save to \texttt{$\sim$/.ssh/id\_ed25519}. 
+
+Feel free to just press \texttt{Enter} through the prompts for the password,
+it's up to you if you want to add one, but it's just an extra step when you
+would be logged in to your computer anyway.
+
+\vspace{0.2\baselineskip}
+
+If you are confused during this step, here's what some output \textit{could}
+look like 
+
+\begin{verbatim}
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/Users/vedantmodi/.ssh/id_ed25519): 
+Created directory '/Users/vedantmodi/.ssh'.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again: 
+Your identification has been saved in /Users/vedantmodi/.ssh/id_ed25519
+Your public key has been saved in /Users/vedantmodi/.ssh/id_ed25519.pub
+The key fingerprint is:
+[SHA256:wP4b8fyo6WexQnJDxKE+dJMFFA3PnAmCeV1jd6LxUuU vedantmodi@MACBOOK-PRO] 
+/* Don't worry I am not using this key anywhere */
+The key's randomart image is:
++--[ED25519 256]--+
+|     o.+BB* +.o  |
+|    o..o+O.X +   |
+|     .=.+ O . E  |
+|     + o.. .     |
+|      +.S        |
+|      .o++.      |
+|       +o.oo     |
+|        .++o     |
+|       .==. .    |
++----[SHA256]-----+
+    
+\end{verbatim}
+
+Once you have generated these keys, go to their location to check them out. Do
+this by typing \texttt{cd DIRECTORY\_OF\_KEY} (in my case, \texttt{cd
+/Users/vedantmodi/.ssh/}). Here, once you \texttt{ls}, you should see at least
+two files \begin{verbatim}
+    id_ed25519      id_ed25519.pub
+\end{verbatim}
+
+\textbf{Under no circumstance} should you \texttt{id\_ed25519} share with
+anyone. \texttt{id\_ed25519} is a \textbf{private key} corresponding to the
+public key, \texttt{id\_ed25519.pub}. Feel free to share the \textbf{public key}
+. If you're curious about this process, feel free to check out this article on
+\href{https://en.wikipedia.org/wiki/Public-key_cryptography}{asymmetric-key
+cryptography}. 
+
+If you share, or suspect someone has access to \texttt{id\_ed25519}, \texttt{rm
+id\_ed25519 id\_ed25519.pub} from your system, and delete the key from the
+host. (You will add the key to the host in the next step, and the removal step
+is similar)
+
+\section{Installing the \texttt{ssh-key} on a server}
+
+Now, we have the \texttt{ssh} key-pair for secure connection to a server. But
+we have to tell the server our public key, so we can use our private key for
+authentication when we want to access the server (basically the whole point). To do this, copy the \textit{public key} using \texttt{ssh-copy-id} to the
+server. 
+
+\begin{verbatim}
+    ssh-copy-id -i ~/.ssh/id_ed25519.pub user@hostname
+\end{verbatim}
+
+If your host is GitHub, you may have to go into your user settings and paste
+the contents of your public key.
+
+\vspace{0.5\baselineskip}
+
+Like all good practitioners, we should test that this worked. To do this, try 
+\begin{verbatim}
+    ssh user@hostname
+\end{verbatim}
+
+You will know if this worked if you aren't asked for a password! 
+
+\section{Adding a shortname for the host}
+
+This next step will make your life a little easier to \texttt{ssh} into your
+server. Instead of typing in \verb|ssh user@hostname| (a mouthful!), you can
+type something like \texttt{ssh tufts}, which is naturally easier to type. Add
+the following to the file \verb|~/.ssh/config|. 
+
+\begin{verbatim}
+Host NICKNAME /* This can be anything you want: tufts, banana, venator, etc */
+  HostName HOSTNAME /* Something like homework.cs.tufts.edu */
+  User USER /* Something vmodi01 */
+  ForwardAgent yes /* Now your other local keys will work on the server */
+\end{verbatim}
+
+Now, test again!
+
+You can test by doing \verb|ssh NICKNAME|, which should work if you followed
+the guide exactly.
+
+\section{Making SFTP more secure}
+
+For the last step, we will leverage our previous work to patch a
+\textbf{security flaw} that maybe present in your SFTP setup. Before I set the
+key-pair up, I had a \texttt{json} file with password to a server I was syncing
+to in \textit{plaintext}, an inherent security flaw. I advise you to search for
+ways to provide your private key to the SFTP setup, in my VSCode SFTP setup, it
+was as easy as adding the property \verb|"privateKeyPath":"~/.ssh/id_ed25519"|. 
+We can see that \verb|~/.ssh/id_ed25519| is just our \textit{private key} from
+before.
+
+\section{Wrap up}
+
+If you're reading this, you have a newly founded cracked setup —
+congratulations! Please feel free to reach out to me, Vedant Modi, if you have
+any questions or have found any errors in my guide, and I hope you enjoyed
+setting this up! 
+\end{document}
